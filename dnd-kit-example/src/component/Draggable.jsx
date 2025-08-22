@@ -13,9 +13,7 @@ export function Draggable({ id, coordinates }) {
         // Sürükleme yokken: Sadece son bilinen pozisyon
         transform: `translate3d(
       ${coordinates.x + (transform?.x || 0)}px, 
-      ${coordinates.y + (transform?.y || 0)}px, 
-      0
-    )`,
+      ${coordinates.y + (transform?.y || 0)}px, 0)`,
         // Sürükleme bittiğinde yumuşak geçiş için
         transition: isDragging ? 'none' : 'transform 250ms ease',
         // Diğer görsel stiller
@@ -34,7 +32,7 @@ export function Draggable({ id, coordinates }) {
     };
     return (
         <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-            Beni Sürükle
+            <p> {coordinates.x + " " + coordinates.y}</p>
         </div>
     );
 }

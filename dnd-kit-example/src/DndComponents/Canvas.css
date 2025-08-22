@@ -1,0 +1,67 @@
+/* src/components/Canvas.css */
+.canvas {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+    background-size: 25px 25px;
+    border: 2px solid #333;
+    overflow: hidden;
+}
+
+.canvas-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #aaa;
+    font-size: 1.5em;
+}
+
+/* DraggableCanvasItem içindeki şekiller için stiller */
+.shape {
+    border: 1px solid #333;
+    background-color: rgba(100, 149, 237, 0.7); /* Cornflower blue */
+    cursor: grab;
+}
+
+.shape:active {
+    cursor: grabbing;
+}
+
+.shape-square {
+    width: 100px;
+    height: 100px;
+}
+
+.shape-l-shape {
+    width: 100px;
+    height: 100px;
+    background: rgb(52, 152, 219);
+    clip-path: polygon(0px 0px, 40% 0px, 40% 60%, 100% 60%, 100% 100%, 0px 100%);
+    cursor: grab;
+}
+
+/* L şeklini oluşturmak için pseudo-element kullanıyoruz */
+.shape-l-shape::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 80px;
+    background-color: inherit; /* Ana elemanla aynı renk */
+    border-right: 2px solid #333;
+}
+.shape-l-shape::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    width: 80px;
+    height: 40px;
+    background-color: inherit;
+}
+.drag-overlay-item {
+    transform: none !important;
+}

@@ -1,0 +1,38 @@
+/* src/components/Sidebar.css */
+.sidebar {
+    width: 150px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-right: 2px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+}
+
+.sidebar-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-item {
+    padding: 20px;
+    background-color: #fff;
+    border: 2px dashed #ccc;
+    cursor: grab;
+    text-align: center;
+    font-weight: bold;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.sidebar-item:hover {
+    background-color: #e9f5ff;
+    border-color: #007bff;
+}
+
+.sidebar-item:active {
+    cursor: move;
+}
