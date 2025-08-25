@@ -15,7 +15,7 @@ function App() {
     const [canvasItems, setCanvasItems] = useState([]);
     const [activeItem, setActiveItem] = useState(null); // <-- Sürüklenen elemanı tutmak için state eklendi
     const canvasRef = useRef(null);
-    const gridSize = 25;
+    const gridSize = 10;
     const [scale, setScale] = useState(1);
     const [initialPointerOffset, setInitialPointerOffset] = useState(null);
 
@@ -178,7 +178,7 @@ function App() {
                 <Sidebar/>
                 <TransformWrapper
                     initialScale={1}
-                    minScale={0.2}
+                    minScale={1}
                     maxScale={5}
                     panning={{disabled: true}}
                     onTransformed={({ state }) => setScale(state.scale)} // scale her değiştiğinde kaydediyoruz
