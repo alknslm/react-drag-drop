@@ -6,7 +6,7 @@ import '@xyflow/react/dist/style.css';
 import './Canvas.css';
 
 // App.js'ten gelen ref'i kullanabilmek için forwardRef kullanıyoruz.
-const CanvasDnd = forwardRef(({items}, ref) => {
+const CanvasDnd = forwardRef(({items, onUpdateRotation, scale}, ref) => {
     const {setNodeRef} = useDroppable({
         id: 'canvas-droppable',
     });
@@ -24,21 +24,30 @@ const CanvasDnd = forwardRef(({items}, ref) => {
 
     return (
         <div ref={combinedRef} className="canvas">
-            {items.length === 0 && (
-                <div className="canvas-placeholder">
-                    Bileşenleri buraya sürükleyin
-                </div>
-            )}
-            {items.map(({id, type, position, currentScale, pointerOffset}) => (
-                <DraggableCanvasItem
-                    key={id}
-                    id={id}
-                    type={type}
-                    position={position}
-                    currentScale={currentScale}
-                    pointerOffset={pointerOffset}
-                />
-            ))}
+            <div
+                className="canvas-grid"
+                style={{transform: `scale(${scale})`}}
+            />
+            <div className="canvas-content">
+                {items.length === 0 && (
+                    <div className="canvas-placeholder">
+                        Bileşenleri buraya sürükleyin
+                    </div>
+                )}
+                {/*{items.map(({id, type, position, currentScale, isOverlay, pointerOffset}) => (*/}
+                {items.map((item) => (
+                    <DraggableCanvasItem
+                        key={item.id}
+                        id={item.id}
+                        type={item.type}
+                        position={item.position}
+                        currentScale={item.currentScale}
+                        onUpdateRotation={onUpdateRotation}
+                        isOverlay={item.isOverlay}
+                        pointerOffset={item.pointerOffset}
+                    />
+                ))}
+            </div>
         </div>
 
 

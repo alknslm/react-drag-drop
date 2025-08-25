@@ -42,7 +42,19 @@ function App() {
 
         if (isSidebarItem) {
             // Sidebar'dan sürükleniyorsa, tipini al
-            setActiveItem({ id: active.id, type: active.id, isSidebarItem: true });
+            // setActiveItem({ id: active.id, type: active.id, isSidebarItem: true });
+            setActiveItem({
+                id: active.id,
+                type: active.id,
+                isSidebarItem: true,
+                position: {
+                    // x ve y burada anlamsız, çünkü DragOverlay pozisyonu kendi yönetiyor.
+                    // Ama yapısal tutarlılık için eklemek iyidir.
+                    x: 0,
+                    y: 0,
+                    rotation: 0 // <-- EKSİK OLAN VE HATAYI ÇÖZEN ANAHTAR!
+                }
+            });
         } else {
             // Kanvastan sürükleniyorsa, tam elemanı bul
             const item = canvasItems.find((i) => i.id === active.id);
@@ -90,6 +102,7 @@ function App() {
                     position: {
                         x: snappedX,
                         y: snappedY,
+                        rotation : 0,
                     },
                     pointerOffset: initialPointerOffset,
                 },
@@ -101,6 +114,7 @@ function App() {
                         return {
                             ...item,
                             position: {
+                                ...item.position,
                                 x: snappedX,
                                 y: snappedY}
                             ,
@@ -112,7 +126,6 @@ function App() {
             );
         }
         setInitialPointerOffset(null); // Sürükleme bitince tutma noktasını sıfırla
-        console.log("dragEnd scale değeri :" + scale);
     };
 
     // Sürükleme iptal edilirse de aktif elemanı temizle
@@ -120,6 +133,22 @@ function App() {
         setActiveItem(null);
     };
 
+    const handleUpdateRotation = (itemId, newRotation) => {
+            setCanvasItems(currentItems => currentItems.map(
+                item => {
+                    if(item.id === itemId){
+                        return{
+                            ...item,
+                            position: {
+                                ...item.position,
+                                rotation: newRotation,
+                            }
+                        }
+                    }
+                    return item;
+                }
+            ));
+    }
     const Controls = () => {
         const {zoomIn, zoomOut, resetTransform} = useControls();
         const buttonStyle = {
@@ -166,7 +195,7 @@ function App() {
                                 justifyContent: 'center'
                             }}
                         >
-                            <Canvas ref={canvasRef} items={canvasItems}/>
+                            <Canvas ref={canvasRef} items={canvasItems} onUpdateRotation={handleUpdateRotation}/>
                         </TransformComponent>
                     </>
                 </TransformWrapper>
