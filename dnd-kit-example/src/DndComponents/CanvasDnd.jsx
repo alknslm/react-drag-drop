@@ -9,6 +9,10 @@ import './Canvas.css';
 const CanvasDnd = forwardRef(({items, onUpdateRotation, scale}, ref) => {
     const {setNodeRef} = useDroppable({
         id: 'canvas-droppable',
+        data: {
+            type: 'CANVAS',
+            accepts: ['canvas-item'],
+        },
     });
 
 
@@ -40,12 +44,18 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale}, ref) => {
                         key={item.id}
                         id={item.id}
                         type={item.type}
+                        typeForCss={item.typeForCss}
                         position={item.position}
                         currentScale={item.currentScale}
+                        accepts={item.accepts}
                         onUpdateRotation={onUpdateRotation}
                         isOverlay={item.isOverlay}
                         pointerOffset={item.pointerOffset}
-                    />
+                    >
+                        {item.children && item.children.map(child => (
+                            <div key={child.id} className={`shape shape-${child.typeForCss}`} removable />
+                        ))}
+                    </DraggableCanvasItem>
                 ))}
             </div>
         </div>

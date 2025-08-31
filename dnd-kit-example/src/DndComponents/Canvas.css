@@ -103,8 +103,8 @@
 }
 
 .shape-square {
-    width: 25px;
-    height: 25px;
+    width: 100px;
+    height: 100px;
 }
 
 .shape-l-shape {
@@ -135,8 +135,8 @@
 }
 
 .shape-curved-monitor {
-    width: 50px;
-    height: 15px;
+    width: 30px;
+    height: 10px;
     background-color: #2c3e50;
     border-radius: 15px 15px 50% 50% / 15px 15px 30px 30px;
     position: relative;
@@ -156,8 +156,8 @@
 
 /* Normal Düz Monitör Ekranı */
 .shape-flat-monitor {
-    width: 50px;
-    height: 15px;
+    width: 30px;
+    height: 10px;
     background-color: #34495e;
     border: 2px solid #2c3e50;
     border-radius: 3px;
@@ -167,8 +167,8 @@
 
 /* Kasa (Tower) */
 .shape-computer-tower {
-    width: 250px;
-    height: 400px;
+    width: 25px;
+    height: 40px;
     background: linear-gradient(to right, #7f8c8d 0%, #95a5a6 100%);
     border: 2px solid #2c3e50;
     border-radius: 5px;

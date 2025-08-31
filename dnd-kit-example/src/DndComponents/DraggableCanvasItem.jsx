@@ -1,5 +1,5 @@
 import React from 'react';
-import {useDraggable} from '@dnd-kit/core';
+import {useDraggable, useDroppable} from '@dnd-kit/core';
 
 // Şekil component'i dışa aktarılıyor
 export const Shape = ({ type, scale}) => {
@@ -10,16 +10,30 @@ export const Shape = ({ type, scale}) => {
     return <div className={`shape shape-${type}`} style={itemStyle} />;
 };
 
-export const DraggableCanvasItem = ({ id, type, position, isOverlay = false, currentScale, onUpdateRotation }) => {
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+/** Masaların üzerine sürüklenebilir elemanlar*/
+export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay = false,
+                                        currentScale, onUpdateRotation, accepts, children }) => {
+    const { attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging } = useDraggable({
         id: id,
         data: {
+            type: type,
             isCanvasItem: true,
         }
     });
-    // const [newRotation, setNewRotation] = useState(0);
 
-    console.log(currentScale);
+    const { isOver, setNodeRef: setDroppableRef } = useDroppable({
+        id: id,
+        data: {
+            type: type,
+            accepts: accepts,
+        },
+    });
+
+    const setNodeRef = (node) => {
+        setDraggableRef(node);
+        setDroppableRef(node);
+    };
+
 
     const handleRotateClick  = (event) => {
         // setNewRotation(prevRotation => prevRotation === 270 ? 0 : prevRotation + 90);
@@ -31,7 +45,6 @@ export const DraggableCanvasItem = ({ id, type, position, isOverlay = false, cur
         onUpdateRotation(id, newRotation);
     };
 
-    console.log(isOverlay);
     const style = {
         position: isOverlay ? 'relative' : 'absolute',
         left: isOverlay ? undefined : `${position?.x + (transform?.x || 0)}px`,
@@ -43,12 +56,13 @@ export const DraggableCanvasItem = ({ id, type, position, isOverlay = false, cur
         // rotate: `${newRotation}deg`,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? -1 : 'auto',
-        backgroundColor: 'pink'
     };
 
     const buttonStyle = {
         transform: `rotate(${position.rotation}deg)`,
     }
+
+    console.log(typeForCss);
 
     return (
         /**
@@ -61,9 +75,9 @@ export const DraggableCanvasItem = ({ id, type, position, isOverlay = false, cur
             <div ref={setNodeRef}
                  {...listeners}
                  {...attributes}
-                style={buttonStyle}
-                 className={`shape shape-${type}`}>
-                {type}
+                 style={buttonStyle}
+                 className={`shape shape-${typeForCss}`}>
+                {children}
             </div>
 
             {!isDragging && (

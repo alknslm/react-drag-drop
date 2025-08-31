@@ -13,15 +13,15 @@ const Sidebar = () => {
 
             <div className="sidebar-furniture">
                 <p>MOBİLYA</p>
-                <DraggableSidebarItem type="square">Kare</DraggableSidebarItem>
-                <DraggableSidebarItem type="l-shape">L Masa</DraggableSidebarItem>
+                <DraggableSidebarItem id="table-1" type="canvas-item" typeForCss="square">Kare</DraggableSidebarItem>
+                <DraggableSidebarItem id="table-2" type="canvas-item" typeForCss="l-shape">L Masa</DraggableSidebarItem>
             </div>
 
             <div className="sidebar-items">
                 <div style={{alignItems : 'center'}}>MALZEMELER</div>
-                <DraggableSidebarItem type="curved-monitor">Curved Monitör</DraggableSidebarItem>
-                <DraggableSidebarItem type="flat-monitor">Düz Monitör</DraggableSidebarItem>
-                <DraggableSidebarItem type="computer-tower">computer-tower</DraggableSidebarItem>
+                <DraggableSidebarItem id="monitor-1" type="table-items" typeForCss="curved-monitor">Curved Monitör</DraggableSidebarItem>
+                <DraggableSidebarItem id="monitor-2" type="table-items" typeForCss="flat-monitor">Düz Monitör</DraggableSidebarItem>
+                <DraggableSidebarItem id="kasa-1" type="computer-tower" typeForCss="computer-tower">computer-tower</DraggableSidebarItem>
             </div>
         </div>
     );

@@ -32,6 +32,8 @@ function App() {
         const { active, activatorEvent } = event;
         const { isSidebarItem } = active.data.current || {};
 
+        const activeData = active.data.current;
+
         if (activatorEvent) {
             const newOffset = {
                 x: activatorEvent.offsetX,
@@ -45,8 +47,9 @@ function App() {
             // setActiveItem({ id: active.id, type: active.id, isSidebarItem: true });
             setActiveItem({
                 id: active.id,
-                type: active.id,
+                type: activeData.type,
                 isSidebarItem: true,
+                typeForCss: activeData.typeForCss,
                 position: {
                     // x ve y burada anlamsız, çünkü DragOverlay pozisyonu kendi yönetiyor.
                     // Ama yapısal tutarlılık için eklemek iyidir.
@@ -66,12 +69,14 @@ function App() {
         const { active, over, delta } = event;
         setActiveItem(null); // Sürükleme bitince aktif elemanı temizle
 
-        if (!over || over.id !== 'canvas-droppable') {
+        if (!over) {
             return;
         }
 
         // 2. Adım: Canvas'ın pozisyonunu ve boyutlarını al
         const canvasRect = canvasRef.current?.getBoundingClientRect();
+        const activeData = active.data.current;
+        const overData = over.data.current;
 
         // ÖNEMLİ: Bırakma anındaki Farenin MUTLAK Konumu
         // dnd-kit'te bu bilgi doğrudan event objesinde gelmez.
@@ -91,22 +96,44 @@ function App() {
         const snappedX = Math.round(newItemX / gridSize) * gridSize;
         const snappedY = Math.round(newItemY / gridSize) * gridSize;
 
-        const isSidebarItem = active.data.current?.isSidebarItem;
+        console.log(activeData);
 
-        if (isSidebarItem) {
-            setCanvasItems((items) => [
-                ...items,
-                {
-                    id: uuid(),
-                    type: active.id,
-                    position: {
-                        x: snappedX,
-                        y: snappedY,
-                        rotation : 0,
-                    },
-                    pointerOffset: initialPointerOffset,
-                },
-            ]);
+        if (activeData?.isSidebarItem) {
+            if (overData?.accepts?.includes(activeData.type)) {
+                if (overData.type === 'CANVAS') {
+                    setCanvasItems((items) => [
+                        ...items,
+                        {
+                            id: `${activeData.type}-${Date.now()}`,
+                            type: activeData.type,
+                            accepts: ['table-items'],
+                            typeForCss: activeData.typeForCss,
+                            position: {
+                                x: snappedX,
+                                y: snappedY,
+                                rotation: 0,
+                            },
+                            children: [],
+                            pointerOffset: initialPointerOffset,
+                        },
+                    ]);
+                }
+            }
+
+            if (overData.type === 'canvas-item') {
+                setCanvasItems(items => items.map(item => {
+                    if (item.id === over.id) {
+                        return {
+                            ...item,
+                            children: [
+                                ...item.children,
+                                { id: `${activeData.type}-${Date.now()}`, type: activeData.type, typeForCss : activeData.typeForCss },
+                            ],
+                        };
+                    }
+                    return item;
+                }));
+            }
         } else {
             setCanvasItems((items) =>
                 items.map((item) => {
@@ -207,6 +234,7 @@ function App() {
                     <DraggableCanvasItem
                         id={activeItem.id}
                         type={activeItem.type}
+                        typeForCss={activeItem.typeForCss}
                         position={activeItem.position} // Overlay pozisyonu kendisi ayarlar
                         isOverlay={true}
                         currentScale={scale}

@@ -3,11 +3,14 @@ import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
-const DraggableSidebarItem = ({ type, children }) => {
+/** Kenar çubuğundaki her ögeyi temsil eder*/
+const DraggableSidebarItem = ({ id, type, children, typeForCss }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: type,
+        id: `sidebar-${id}`,
         data: {
+            type: type,
             isSidebarItem: true,
+            typeForCss: typeForCss,
         },
     });
 
@@ -19,7 +22,7 @@ const DraggableSidebarItem = ({ type, children }) => {
 
     return (
         <div
-            className={`sidebar-item sidebar-item-${type}`}
+            className={`sidebar-item sidebar-item-${typeForCss}`}
             ref={setNodeRef}
             style={style}
             {...listeners}
