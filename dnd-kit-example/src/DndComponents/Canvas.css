@@ -116,27 +116,12 @@
 }
 
 /* L şeklini oluşturmak için pseudo-element kullanıyoruz */
-.shape-l-shape::before {
-    content: '';
-    top: 0;
-    left: 0;
-    width: 40px;
-    height: 80px;
-    background-color: inherit; /* Ana elemanla aynı renk */
-    border-right: 2px solid #333;
-}
-.shape-l-shape::after {
-    content: '';
-    bottom: 0;
-    left: 40px;
-    width: 80px;
-    height: 40px;
-    background-color: inherit;
-}
+
+
 
 .shape-curved-monitor {
-    width: 30px;
-    height: 10px;
+    width: 15px;
+    height: 8px;
     background-color: #2c3e50;
     border-radius: 15px 15px 50% 50% / 15px 15px 30px 30px;
     position: relative;

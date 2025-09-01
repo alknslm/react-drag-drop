@@ -69,6 +69,12 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
          *  İki farklı style oluşturduk.
          *  Birisi dış div için (style) dnd-kit özelliklerini taşır
          *  Diğeri sadece rotasyon için (buttonStyle) shape dönme efekti alsın diye verdik.
+         *  className={`shape shape-${typeForCss}`}
+         *  {
+         *                     typeForCss == "l-shape" ?  <div style={{borderStyle: "solid", borderWidth : "0 0",
+         *                         position: "relative", float:"right", clear :"none",
+         *                         width: "60%", height : "60%", backgroundColor :"red"}}></div> : null
+         *                 }
          */
         <div style={style} className="shape-wrapper">
 
@@ -77,6 +83,7 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
                  {...attributes}
                  style={buttonStyle}
                  className={`shape shape-${typeForCss}`}>
+
                 {children}
             </div>
 

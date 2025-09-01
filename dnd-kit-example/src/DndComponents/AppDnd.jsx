@@ -1,7 +1,6 @@
 // src/App.js
 import React, {useRef, useState} from 'react';
 import {DndContext, DragOverlay, PointerSensor, useSensor, useSensors,} from '@dnd-kit/core';
-import uuid from 'react-uuid';
 
 import Canvas from './CanvasDnd.jsx';
 import Sidebar from './SidebarDnd.jsx';
