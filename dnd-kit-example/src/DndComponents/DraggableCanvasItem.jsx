@@ -1,19 +1,23 @@
 import React from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
+import {SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import TableItem from "./TableItem.jsx";
 
 // Şekil component'i dışa aktarılıyor
-export const Shape = ({ type, scale}) => {
+export const Shape = ({type, scale}) => {
     const itemStyle = {
         transform: `scale(${scale})`
     }
     console.log(scale);
-    return <div className={`shape shape-${type}`} style={itemStyle} />;
+    return <div className={`shape shape-${type}`} style={itemStyle}/>;
 };
 
 /** Masaların üzerine sürüklenebilir elemanlar*/
-export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay = false,
-                                        currentScale, onUpdateRotation, accepts, children }) => {
-    const { attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging } = useDraggable({
+export const DraggableCanvasItem = ({
+                                        id, type, typeForCss, position, isOverlay = false,
+                                        currentScale, onUpdateRotation, accepts, children=[]
+                                    }) => {
+    const {attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging} = useDraggable({
         id: id,
         data: {
             type: type,
@@ -21,7 +25,7 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
         }
     });
 
-    const { isOver, setNodeRef: setDroppableRef } = useDroppable({
+    const {setNodeRef: setDroppableRef} = useDroppable({
         id: id,
         data: {
             type: type,
@@ -35,11 +39,11 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
     };
 
 
-    const handleRotateClick  = (event) => {
+    const handleRotateClick = (event) => {
         // setNewRotation(prevRotation => prevRotation === 270 ? 0 : prevRotation + 90);
         event.stopPropagation();
         let newRotation = (position.rotation || 0) + 90;
-        if(newRotation === 360){
+        if (newRotation === 360) {
             newRotation = 0;
         }
         onUpdateRotation(id, newRotation);
@@ -60,9 +64,10 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
 
     const buttonStyle = {
         transform: `rotate(${position.rotation}deg)`,
+        transition: "transform 0.2s ease-in-out"
     }
 
-    console.log(typeForCss);
+    const childIds = children.map(child => child.id);
 
     return (
         /**
@@ -77,14 +82,31 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
          *                 }
          */
         <div style={style} className="shape-wrapper">
-
+            <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
             <div ref={setNodeRef}
                  {...listeners}
                  {...attributes}
                  style={buttonStyle}
                  className={`shape shape-${typeForCss}`}>
-
-                {children}
+                {
+                    typeForCss == "l-shape" ? <div style={{
+                        borderStyle: "solid",
+                        borderWidth: "0 0",
+                        position: "relative",
+                        float: "right",
+                        clear: "none",
+                        width: "60%",
+                        height: "60%",
+                    }}></div> : null
+                }
+                {children.map(table => (
+                    <TableItem
+                        key={table.id}
+                        id={table.id}
+                        parentId={id}
+                        typeForCss={table.typeForCss}
+                    />
+                ))}
             </div>
 
             {!isDragging && (
@@ -96,6 +118,7 @@ export const DraggableCanvasItem = ({ id, type, typeForCss, position, isOverlay 
                     ↻
                 </button>
             )}
+            </SortableContext>
         </div>
     );
 };

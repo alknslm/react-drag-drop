@@ -52,9 +52,7 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale}, ref) => {
                         isOverlay={item.isOverlay}
                         pointerOffset={item.pointerOffset}
                     >
-                        {item.children && item.children.map(child => (
-                            <div key={child.id} className={`shape shape-${child.typeForCss}`} removable />
-                        ))}
+                        {item.children}
                     </DraggableCanvasItem>
                 ))}
             </div>

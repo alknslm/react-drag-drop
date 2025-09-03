@@ -21,7 +21,7 @@ const Sidebar = () => {
                 <div style={{alignItems : 'center'}}>MALZEMELER</div>
                 <DraggableSidebarItem id="monitor-1" type="table-items" typeForCss="curved-monitor">Curved Monitör</DraggableSidebarItem>
                 <DraggableSidebarItem id="monitor-2" type="table-items" typeForCss="flat-monitor">Düz Monitör</DraggableSidebarItem>
-                <DraggableSidebarItem id="kasa-1" type="computer-tower" typeForCss="computer-tower">computer-tower</DraggableSidebarItem>
+                <DraggableSidebarItem id="kasa-1" type="table-items" typeForCss="computer-tower">computer-tower</DraggableSidebarItem>
             </div>
         </div>
     );

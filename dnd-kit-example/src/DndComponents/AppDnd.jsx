@@ -9,6 +9,7 @@ import './App.css';
 import {restrictToWindowEdges} from "@dnd-kit/modifiers";
 import {TransformComponent, TransformWrapper, useControls} from "react-zoom-pan-pinch";
 import {Controls} from "@xyflow/react";
+import {arrayMove} from "@dnd-kit/sortable";
 
 function App() {
     const [canvasItems, setCanvasItems] = useState([]);
@@ -25,6 +26,19 @@ function App() {
             },
         })
     );
+
+
+    const findContainer = (id) => {
+        for (const container of canvasItems) {
+            if (container.id === id) {
+                return container;
+            }
+            if (container.children.find(item => item.id === id)) {
+                return container;
+            }
+        }
+        return null;
+    };
 
     // Sürükleme başladığında çalışır
     const handleDragStart = (event) => {
@@ -95,7 +109,8 @@ function App() {
         const snappedX = Math.round(newItemX / gridSize) * gridSize;
         const snappedY = Math.round(newItemY / gridSize) * gridSize;
 
-        console.log(activeData);
+        const activeContainer = findContainer(activeData.parentId);
+        const overContainer = findContainer(over.id);
 
         if (activeData?.isSidebarItem) {
             if (overData?.accepts?.includes(activeData.type)) {
@@ -119,7 +134,7 @@ function App() {
                 }
             }
 
-            if (overData.type === 'canvas-item') {
+            if (overData.type === 'canvas-item' && activeData.type === 'table-items') {
                 setCanvasItems(items => items.map(item => {
                     if (item.id === over.id) {
                         return {
@@ -134,23 +149,71 @@ function App() {
                 }));
             }
         } else {
-            setCanvasItems((items) =>
-                items.map((item) => {
-                    if (item.id === active.id) {
-                        return {
-                            ...item,
-                            position: {
-                                ...item.position,
-                                x: snappedX,
-                                y: snappedY}
-                            ,
-                            pointerOffset: initialPointerOffset,
-                        };
-                    }
-                    return item;
-                })
-            );
+            console.log(overContainer);
+            if (activeContainer && overContainer) {
+                // Senaryo 2: Aynı konteyner içinde sıralama
+                if (activeContainer.id === overContainer.id) {
+                    setCanvasItems(prev => {
+                        const newItems = [...prev];
+                        const containerIndex = newItems.findIndex(c => c.id === activeContainer.id);
+                        if(containerIndex !== -1) {
+                            const oldIndex = newItems[containerIndex].children.findIndex(item => item.id === active.id);
+                            const newIndex = newItems[containerIndex].children.findIndex(item => item.id === over.id);
+                            // Bırakılan yer bir öğe değil de konteynerın kendisi ise sona ekle
+                            if (newIndex !== -1) {
+                                newItems[containerIndex].children = arrayMove(newItems[containerIndex].children, oldIndex, newIndex);
+                            }
+                        }
+                        return newItems;
+                    });
+                }
+                // Senaryo 3: Konteynerlar arası taşıma
+                else {
+                    setCanvasItems(prev => {
+                        const newItems = [...prev];
+                        const sourceContainerIndex = newItems.findIndex(c => c.id === activeContainer.id);
+                        const destContainerIndex = newItems.findIndex(c => c.id === overContainer.id);
+
+                        if (sourceContainerIndex !== -1 && destContainerIndex !== -1) {
+                            const sourceChildren = newItems[sourceContainerIndex].children;
+                            const destChildren = newItems[destContainerIndex].children;
+
+                            const itemIndex = sourceChildren.findIndex(item => item.id === active.id);
+                            const [movedItem] = sourceChildren.splice(itemIndex, 1);
+
+                            // Bırakılan yer bir öğenin üstü mü yoksa konteynerın kendisi mi?
+                            const overItemIndex = destChildren.findIndex(item => item.id === over.id);
+                            if (overItemIndex !== -1) {
+                                destChildren.splice(overItemIndex, 0, movedItem);
+                            } else {
+                                destChildren.push(movedItem); // Konteyner boşsa veya sona bırakıldıysa
+                            }
+                        }
+                        return newItems;
+                    });
+                }
+            }
+            else{
+                setCanvasItems((items) =>
+                    items.map((item) => {
+                        if (item.id === active.id) {
+                            return {
+                                ...item,
+                                position: {
+                                    ...item.position,
+                                    x: snappedX,
+                                    y: snappedY}
+                                ,
+                                pointerOffset: initialPointerOffset,
+                            };
+                        }
+                        return item;
+                    })
+                );
+            }
+
         }
+        console.log(overContainer);
         setInitialPointerOffset(null); // Sürükleme bitince tutma noktasını sıfırla
     };
 
