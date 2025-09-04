@@ -74,6 +74,38 @@ function App() {
         } else {
             // Kanvastan sürükleniyorsa, tam elemanı bul
             const item = canvasItems.find((i) => i.id === active.id);
+            const canvasRect = canvasRef.current?.getBoundingClientRect();
+
+            if (!item || !canvasRect) {
+                // Eğer eleman veya kanvas bulunamazsa, varsayılan ofseti kullan
+                const fallbackOffset = {
+                    x: activatorEvent.offsetX,
+                    y: activatorEvent.offsetY,
+                };
+                setInitialPointerOffset(fallbackOffset);
+                setActiveItem(item);
+                return;
+            }
+
+            // 2. Elemanın döndürmeden bağımsız, mantıksal sol üst köşesinin
+            //    ekrandaki mutlak (absolute) pozisyonunu hesapla.
+            //    (Kanvasın Pozisyonu) + (Elemanın Kanvas İçi Pozisyonu * Ölçek)
+            const itemAbsoluteX = canvasRect.left + (item.position.x * scale);
+            const itemAbsoluteY = canvasRect.top + (item.position.y * scale);
+
+            // 3. Farenin mutlak ekran pozisyonunu al.
+            const pointerAbsoluteX = activatorEvent.clientX;
+            const pointerAbsoluteY = activatorEvent.clientY;
+
+            // 4. İki mutlak pozisyon arasındaki farkı bularak doğru ofseti hesapla.
+            //    Bu hesaplama, elemanın `transform: rotate()` özelliğinden etkilenmez.
+            const newOffset = {
+                x: pointerAbsoluteX - itemAbsoluteX,
+                y: pointerAbsoluteY - itemAbsoluteY,
+            };
+
+            // 5. Hesaplanan yeni ofseti ve aktif elemanı state'e kaydet.
+            setInitialPointerOffset(newOffset);
             setActiveItem(item);
         }
     };
@@ -149,7 +181,6 @@ function App() {
                 }));
             }
         } else {
-            console.log(overContainer);
             if (activeContainer && overContainer) {
                 // Senaryo 2: Aynı konteyner içinde sıralama
                 if (activeContainer.id === overContainer.id) {
@@ -213,7 +244,6 @@ function App() {
             }
 
         }
-        console.log(overContainer);
         setInitialPointerOffset(null); // Sürükleme bitince tutma noktasını sıfırla
     };
 

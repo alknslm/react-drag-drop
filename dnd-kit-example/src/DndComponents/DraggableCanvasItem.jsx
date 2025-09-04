@@ -1,6 +1,6 @@
 import React from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
-import {SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import TableItem from "./TableItem.jsx";
 
 // Şekil component'i dışa aktarılıyor
@@ -15,7 +15,7 @@ export const Shape = ({type, scale}) => {
 /** Masaların üzerine sürüklenebilir elemanlar*/
 export const DraggableCanvasItem = ({
                                         id, type, typeForCss, position, isOverlay = false,
-                                        currentScale, onUpdateRotation, accepts, children=[]
+                                        currentScale,pointerOffset, onUpdateRotation, accepts, children=[]
                                     }) => {
     const {attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging} = useDraggable({
         id: id,
@@ -82,7 +82,7 @@ export const DraggableCanvasItem = ({
          *                 }
          */
         <div style={style} className="shape-wrapper">
-            <SortableContext items={childIds} strategy={verticalListSortingStrategy}>
+            <SortableContext items={childIds} strategy={horizontalListSortingStrategy}>
             <div ref={setNodeRef}
                  {...listeners}
                  {...attributes}
