@@ -2,15 +2,7 @@ import React from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import TableItem from "./TableItem.jsx";
-
-// Şekil component'i dışa aktarılıyor
-export const Shape = ({type, scale}) => {
-    const itemStyle = {
-        transform: `scale(${scale})`
-    }
-    console.log(scale);
-    return <div className={`shape shape-${type}`} style={itemStyle}/>;
-};
+import { CSS } from '@dnd-kit/utilities'
 
 /** Masaların üzerine sürüklenebilir elemanlar*/
 export const DraggableCanvasItem = ({
@@ -67,6 +59,25 @@ export const DraggableCanvasItem = ({
         transition: "transform 0.2s ease-in-out"
     }
 
+    const scaledTransform = transform
+        ? {
+            ...transform,
+            x: transform.x * currentScale,
+            y: transform.y * currentScale
+        }
+        : null;
+
+    const wrapperStyle = {
+        position: isOverlay ? 'relative' : 'absolute',
+        left: isOverlay ? undefined : `${position?.x}px`,
+        top: isOverlay ? undefined : `${position?.y}px`,
+        transformOrigin: "center center",
+        transform: `${transform ? CSS.Translate.toString(scaledTransform) + ' ' : ''}scale(${currentScale})`,
+        opacity: isDragging ? 0 : 1,
+        zIndex: isDragging ? -1 : 'auto',
+    };
+
+
     const childIds = children.map(child => child.id);
 
     return (
@@ -81,34 +92,33 @@ export const DraggableCanvasItem = ({
          *                         width: "60%", height : "60%", backgroundColor :"red"}}></div> : null
          *                 }
          */
-        <div style={style} className="shape-wrapper">
+        <div ref={setNodeRef} style={wrapperStyle} {...listeners} {...attributes} className="shape-wrapper">
             <SortableContext items={childIds} strategy={horizontalListSortingStrategy}>
-            <div ref={setNodeRef}
-                 {...listeners}
-                 {...attributes}
-                 style={buttonStyle}
-                 className={`shape shape-${typeForCss}`}>
-                {
-                    typeForCss == "l-shape" ? <div style={{
-                        borderStyle: "solid",
-                        borderWidth: "0 0",
-                        position: "relative",
-                        float: "right",
-                        clear: "none",
-                        width: "60%",
-                        height: "60%",
-                    }}></div> : null
-                }
-                {children.map(table => (
-                    <TableItem
-                        key={table.id}
-                        id={table.id}
-                        parentId={id}
-                        typeForCss={table.typeForCss}
-                    />
-                ))}
-            </div>
+                <div style={{transform : `rotate(${position.rotation}deg)`, transition: "transform 0.2s ease-in-out"}}
+                     className={`shape shape-${typeForCss}`}>
+                    {typeForCss === "l-shape" && (
+                        <div style={{
+                            borderStyle: "solid",
+                            borderWidth: "0 0",
+                            position: "relative",
+                            float: "right",
+                            clear: "none",
+                            width: "60%",
+                            height: "60%",
+                        }}></div>
+                    )}
+                    {children.map(table => (
+                        <TableItem
+                            key={table.id}
+                            id={table.id}
+                            parentId={id}
+                            typeForCss={table.typeForCss}
+                        />
+                    ))}
+                </div>
+            </SortableContext>
 
+            {/* Döndürme butonu rotation'dan bağımsız */}
             {!isDragging && (
                 <button
                     onClick={handleRotateClick}
@@ -118,7 +128,6 @@ export const DraggableCanvasItem = ({
                     ↻
                 </button>
             )}
-            </SortableContext>
         </div>
     );
 };

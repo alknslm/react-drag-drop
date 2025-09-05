@@ -22,8 +22,8 @@ export const TableItem  =  ({id , typeForCss, content, parentId}) => {
         opacity: isDragging ? 0.5 : 1,
     }
 
-    const clickTableItems = (content) =>{
-        console.log(content);
+    const clickTableItems = () =>{
+        console.log("Tıklandı");
     }
 
     return (
@@ -33,7 +33,7 @@ export const TableItem  =  ({id , typeForCss, content, parentId}) => {
             {...attributes}
             style={style}
             className={`shape shape-${typeForCss}`}
-            onclick={() => clickTableItems(content)}
+            onClick={clickTableItems}
         >
             {content}
         </div>
