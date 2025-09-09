@@ -1,0 +1,77 @@
+.properties-panel {
+    width: 300px;
+    height: 100vh; /* Tam yükseklik */
+    position: fixed; /* Sayfa scroll olsa bile sabit kalır */
+    top: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    border-left: 1px solid #dee2e6;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out; /* Animasyon */
+    z-index: 1000;
+}
+
+.panel-header {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.close-btn {
+    border: none;
+    background: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 0.5rem;
+}
+
+.panel-content {
+    padding: 1rem;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.prop-item {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.prop-item label {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 4px;
+}
+
+.prop-item span,
+.prop-item input {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.prop-item input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}

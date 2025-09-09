@@ -7,13 +7,13 @@ import Sidebar from './SidebarDnd.jsx';
 import {DraggableCanvasItem} from './DraggableCanvasItem'; // <-- Sürükleme önizlemesi için eklendi
 import './App.css';
 import {restrictToWindowEdges} from "@dnd-kit/modifiers";
-import {TransformComponent, TransformWrapper, useControls} from "react-zoom-pan-pinch";
-import {Controls} from "@xyflow/react";
 import {arrayMove} from "@dnd-kit/sortable";
+import PropertiesPanel from "./PropertiesPanel.jsx";
 
 function App() {
     const [canvasItems, setCanvasItems] = useState([]);
     const [activeItem, setActiveItem] = useState(null); // <-- Sürüklenen elemanı tutmak için state eklendi
+    const [selectedItemId, setSelectedItemId] = useState(null);
     const canvasRef = useRef(null);
     const gridSize = 10;
     const [scale, setScale] = useState(1);
@@ -27,6 +27,26 @@ function App() {
         })
     );
 
+    const findItemById = (items, itemId) => {
+        for (const item of items) {
+            if (item.id === itemId) return item;
+            if (item.children) {
+                const foundChild = findItemById(item.children, itemId);
+                if (foundChild) return foundChild;
+            }
+        }
+        return null;
+    };
+
+    const selectedItem = findItemById(canvasItems,selectedItemId);
+
+    const handleSelectItem = (itemId) => {
+        setSelectedItemId(itemId);
+    };
+
+    const handleDeselect = () => {
+        setSelectedItemId(null);
+    };
 
     const findContainer = (id) => {
         for (const container of canvasItems) {
@@ -57,7 +77,6 @@ function App() {
 
         if (isSidebarItem) {
             // Sidebar'dan sürükleniyorsa, tipini al
-            // setActiveItem({ id: active.id, type: active.id, isSidebarItem: true });
             setActiveItem({
                 id: active.id,
                 type: activeData.type,
@@ -268,56 +287,30 @@ function App() {
                 }
             ));
     }
-    const Controls = () => {
-        const {zoomIn, zoomOut, resetTransform} = useControls();
-        const buttonStyle = {
-            margin: '5px',
-            padding: '10px 15px',
-            fontSize: '16px',
-            cursor: 'pointer'
-        };
 
-        return (
-            <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10 }}>
-                <button style={buttonStyle} onClick={() => zoomIn()}>Zoom In</button>
-                <button style={buttonStyle} onClick={() => zoomOut()}>Zoom Out</button>
-                <button style={buttonStyle} onClick={() => resetTransform()}>Reset</button>
-            </div>
-        );
-    };
 
     return (
         <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
-            onDragCancel={handleDragCancel}
-        >
+            onDragCancel={handleDragCancel}>
+
             <div className="app-container">
                 <Sidebar/>
-                <TransformWrapper
-                    initialScale={1}
-                    minScale={1}
-                    maxScale={5}
-                    panning={{disabled: true}}
-                    onTransformed={({ state }) => setScale(state.scale)} // scale her değiştiğinde kaydediyoruz
-                >
-                    <>
-                        <Controls/>
-                        <TransformComponent
-                            wrapperStyle={{width: '100%', height: '100%'}}
-                            contentStyle={{
-                                width: '100%',
-                                height: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <Canvas ref={canvasRef} items={canvasItems} onUpdateRotation={handleUpdateRotation}/>
-                        </TransformComponent>
-                    </>
-                </TransformWrapper>
+                <Canvas ref={canvasRef}
+                        items={canvasItems}
+                        onUpdateRotation={handleUpdateRotation}
+                        selectedItemId={selectedItemId}
+                        onSelectItem={handleSelectItem}
+                        setScale={setScale}/>
+
+                {selectedItem && (
+                    <PropertiesPanel
+                        item={selectedItem}
+                        onClose={handleDeselect}
+                    />
+                )}
             </div>
 
             {/* DragOverlay, sürüklenen elemanı en üste taşır */}

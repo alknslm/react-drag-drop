@@ -7,7 +7,7 @@ import { CSS } from '@dnd-kit/utilities'
 /** Masaların üzerine sürüklenebilir elemanlar*/
 export const DraggableCanvasItem = ({
                                         id, type, typeForCss, position, isOverlay = false,
-                                        currentScale,pointerOffset, onUpdateRotation, accepts, children=[]
+                                        currentScale,onSelectItem, isSelected,selectedItemId, onUpdateRotation, accepts, children=[]
                                     }) => {
     const {attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging} = useDraggable({
         id: id,
@@ -30,6 +30,11 @@ export const DraggableCanvasItem = ({
         setDroppableRef(node);
     };
 
+    // Tıklandığında seçimi tetikle ve event'in canvas'a yayılmasını engelle
+    const handleClick = (e) => {
+        e.stopPropagation(); // Bu çok önemli! Yoksa canvas'a tıklama olayı da tetiklenir.
+        onSelectItem(id);
+    };
 
     const handleRotateClick = (event) => {
         // setNewRotation(prevRotation => prevRotation === 270 ? 0 : prevRotation + 90);
@@ -92,7 +97,7 @@ export const DraggableCanvasItem = ({
          *                         width: "60%", height : "60%", backgroundColor :"red"}}></div> : null
          *                 }
          */
-        <div ref={setNodeRef} style={wrapperStyle} {...listeners} {...attributes} className="shape-wrapper">
+        <div ref={setNodeRef} style={wrapperStyle} {...listeners} {...attributes} onClick={handleClick} className="shape-wrapper">
             <SortableContext items={childIds} strategy={horizontalListSortingStrategy}>
                 <div style={{transform : `rotate(${position.rotation}deg)`, transition: "transform 0.2s ease-in-out"}}
                      className={`shape shape-${typeForCss}`}>
@@ -113,6 +118,8 @@ export const DraggableCanvasItem = ({
                             id={table.id}
                             parentId={id}
                             typeForCss={table.typeForCss}
+                            onSelectItem={onSelectItem} // onSelectItem fonksiyonunu TableItem'a aktar
+                            isSelected={table.id === selectedItemId}
                         />
                     ))}
                 </div>

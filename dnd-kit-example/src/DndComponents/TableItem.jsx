@@ -1,7 +1,7 @@
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 
-export const TableItem  =  ({id , typeForCss, content, parentId}) => {
+export const TableItem  =  ({id , typeForCss, content, parentId,onSelectItem}) => {
     const { attributes,
         listeners,
         setNodeRef,
@@ -22,9 +22,14 @@ export const TableItem  =  ({id , typeForCss, content, parentId}) => {
         opacity: isDragging ? 0.5 : 1,
     }
 
-    const clickTableItems = () =>{
-        console.log("Tıklandı");
-    }
+    const handleItemClick = (e) => {
+        // 1. Olayın üst component'lere (DraggableCanvasItem'a) yayılmasını engelle.
+        // BU ADIM ÇOK KRİTİK!
+        e.stopPropagation();
+
+        // 2. App.js'teki state'i güncellemek için kendi ID'n ile onSelectItem'ı çağır.
+        onSelectItem(id);
+    };
 
     return (
         <div
@@ -33,7 +38,7 @@ export const TableItem  =  ({id , typeForCss, content, parentId}) => {
             {...attributes}
             style={style}
             className={`shape shape-${typeForCss}`}
-            onClick={clickTableItems}
+            onClick={handleItemClick}
         >
             {content}
         </div>
