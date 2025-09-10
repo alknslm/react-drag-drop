@@ -11,21 +11,19 @@ import {arrayMove} from "@dnd-kit/sortable";
 import PropertiesPanel from "./PropertiesPanel.jsx";
 
 function App() {
-    const [canvasItems, setCanvasItems] = useState([]);
-    const [activeItem, setActiveItem] = useState(null); // <-- Sürüklenen elemanı tutmak için state eklendi
-    const [selectedItemId, setSelectedItemId] = useState(null);
+    const [canvasItems, setCanvasItems] = useState([]); // store'a konulacak
+    const [activeItem, setActiveItem] = useState(null); // <-- Sürüklenen elemanı tutmak için state eklendi (store'a konulacak)
+    const [selectedItemId, setSelectedItemId] = useState(null); // store'a konulacak
     const canvasRef = useRef(null);
     const gridSize = 10;
-    const [scale, setScale] = useState(1);
+    const [scale, setScale] = useState(1); // store'a konulacak
     const [initialPointerOffset, setInitialPointerOffset] = useState(null);
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
+    const sensors = useSensors(useSensor(PointerSensor, {
             activationConstraint: {
                 distance: 8,
             },
-        })
-    );
+        }));
 
     const findItemById = (items, itemId) => {
         for (const item of items) {

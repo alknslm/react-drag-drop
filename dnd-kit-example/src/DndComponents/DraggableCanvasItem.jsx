@@ -2,7 +2,7 @@ import React from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import TableItem from "./TableItem.jsx";
-import { CSS } from '@dnd-kit/utilities'
+import {CSS} from '@dnd-kit/utilities'
 
 /** Masaların üzerine sürüklenebilir elemanlar*/
 export const DraggableCanvasItem = ({
@@ -45,24 +45,6 @@ export const DraggableCanvasItem = ({
         }
         onUpdateRotation(id, newRotation);
     };
-
-    const style = {
-        position: isOverlay ? 'relative' : 'absolute',
-        left: isOverlay ? undefined : `${position?.x + (transform?.x || 0)}px`,
-        top: isOverlay ? undefined : `${position?.y + (transform?.y || 0)}px`,
-        // transformOrigin: `${pointerOffset.x}px ${pointerOffset.y}px`,
-        transformOrigin: "center center",
-        // transform: transform ? `${CSS.Translate.toString(scaledTransform)} scale(${currentScale})` : `scale(${currentScale})`,
-        transform: `scale(${currentScale})`,
-        // rotate: `${newRotation}deg`,
-        opacity: isDragging ? 0 : 1,
-        zIndex: isDragging ? -1 : 'auto',
-    };
-
-    const buttonStyle = {
-        transform: `rotate(${position.rotation}deg)`,
-        transition: "transform 0.2s ease-in-out"
-    }
 
     const scaledTransform = transform
         ? {
@@ -124,7 +106,6 @@ export const DraggableCanvasItem = ({
                     ))}
                 </div>
             </SortableContext>
-
             {/* Döndürme butonu rotation'dan bağımsız */}
             {!isDragging && (
                 <button
@@ -145,5 +126,23 @@ export const DraggableCanvasItem = ({
 //         x: transform.x * currentScale, // veya * currentScale ihtiyacına göre
 //         y: transform.y * currentScale,
 //     } : null;
+
+// const style = {
+//     position: isOverlay ? 'relative' : 'absolute',
+//     left: isOverlay ? undefined : `${position?.x + (transform?.x || 0)}px`,
+//     top: isOverlay ? undefined : `${position?.y + (transform?.y || 0)}px`,
+//     // transformOrigin: `${pointerOffset.x}px ${pointerOffset.y}px`,
+//     transformOrigin: "center center",
+//     // transform: transform ? `${CSS.Translate.toString(scaledTransform)} scale(${currentScale})` : `scale(${currentScale})`,
+//     transform: `scale(${currentScale})`,
+//     // rotate: `${newRotation}deg`,
+//     opacity: isDragging ? 0 : 1,
+//     zIndex: isDragging ? -1 : 'auto',
+// };
+//
+// const buttonStyle = {
+//     transform: `rotate(${position.rotation}deg)`,
+//     transition: "transform 0.2s ease-in-out"
+// }
 
 export default DraggableCanvasItem;
