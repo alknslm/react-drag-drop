@@ -1,0 +1,100 @@
+Redux için AppDnd.js son hali gemini cevabı :
+
+// src/App.js (Refactor Edilmiş Hali)
+
+import React, { useRef, useState } from 'react';
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { useSelector, useDispatch } from 'react-redux'; // Redux hooks
+import {
+    addItem, updateItemPosition, updateItemRotation, addChildToItem,
+    selectItem, deselectItem, setScale, // Action'ları import et
+} from './features/canvas/canvasSlice';
+
+import Canvas from './CanvasDnd.jsx';
+import Sidebar from './SidebarDnd.jsx';
+import { DraggableCanvasItem } from './DraggableCanvasItem';
+import PropertiesPanel from "./PropertiesPanel.jsx";
+import './App.css';
+
+function App() {
+    // === REDUX STORE'DAN VERİ ÇEKME ===
+    const dispatch = useDispatch();
+    const canvasItems = useSelector((state) => state.canvas.items);
+    const selectedItemId = useSelector((state) => state.canvas.selectedItemId);
+    const scale = useSelector((state) => state.canvas.scale);
+
+    // === COMPONENT'TE KALAN LOCAL STATE'LER ===
+    const [activeItem, setActiveItem] = useState(null);
+    const [initialPointerOffset, setInitialPointerOffset] = useState(null);
+    const canvasRef = useRef(null);
+    const gridSize = 10;
+
+    const sensors = useSensors(useSensor(PointerSensor, { /* ... */ }));
+
+    // ... findItemById ve findContainer gibi yardımcı fonksiyonlar kalabilir ...
+
+    const selectedItem = findItemById(canvasItems, selectedItemId);
+
+    // === HANDLER'LARI DISPATCH KULLANACAK ŞEKİLDE GÜNCELLEME ===
+
+    const handleSelectItem = (itemId) => dispatch(selectItem(itemId));
+    const handleDeselect = () => dispatch(deselectItem());
+    const handleUpdateRotation = (itemId, newRotation) => dispatch(updateItemRotation({ id: itemId, newRotation }));
+    const handleSetScale = (newScale) => dispatch(setScale(newScale));
+
+    const handleDragStart = (event) => { /* ... BU FONKSİYON AYNI KALIR, activeItem'ı set eder ... */ };
+    const handleDragCancel = () => { /* ... BU FONKSİYON AYNI KALIR, activeItem'ı set eder ... */ };
+
+    const handleDragEnd = (event) => {
+        // Bu fonksiyondaki setCanvasItems(...) çağrıları yerine dispatch(action(...)) kullanılır.
+        // Örnek:
+        // ... hesaplamalar ...
+
+        if (activeData?.isSidebarItem) {
+            // ...
+            if (overData.type === 'CANVAS') {
+                const newItem = {
+                    id: `${activeData.type}-${Date.now()}`,
+                    type: activeData.type,
+                    // ... diğer özellikler
+                    position: { x: snappedX, y: snappedY, rotation: 0 },
+                    children: [],
+                };
+                dispatch(addItem(newItem));
+            }
+            if (overData.type === 'canvas-item' && activeData.type === 'table-items') {
+                const newChild = { id: `${activeData.type}-${Date.now()}`, type: activeData.type, typeForCss: activeData.typeForCss };
+                dispatch(addChildToItem({ parentId: over.id, child: newChild }));
+            }
+        } else {
+            // ...
+            dispatch(updateItemPosition({ id: active.id, newPosition: { x: snappedX, y: snappedY } }));
+        }
+
+        setActiveItem(null);
+        setInitialPointerOffset(null);
+    };
+
+
+    return (
+        <DndContext /* ... */ onDragEnd={handleDragEnd}>
+            <div className="app-container">
+                <Sidebar />
+                {/* Prop'lar artık Redux'tan geldiği için buradan kaldırılır */}
+                <Canvas
+                    ref={canvasRef}
+                    // onUpdateRotation, selectedItemId, onSelectItem, setScale gibi proplar kalktı!
+                    // İhtiyaç duyan component'ler veriyi doğrudan Redux'tan alacak.
+                />
+                {/* PropertiesPanel de veriyi Redux'tan alabilir */}
+                {selectedItem && <PropertiesPanel item={selectedItem} />}
+            </div>
+            {/* DragOverlay aynı kalır, çünkü local state (activeItem) kullanır */}
+            <DragOverlay>
+              {/* ... */}
+            </DragOverlay>
+        </DndContext>
+    );
+}
+
+export default App;
