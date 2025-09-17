@@ -1,7 +1,16 @@
 import React from 'react';
-import './PropertiesPanel.css'; // Stil dosyası
+import './PropertiesPanel.css';
+import {useDispatch, useSelector} from "react-redux";
+import {deselectItem, selectSelectedItem} from "./reducers/canvasSlice.jsx";
 
-const PropertiesPanel = ({ item, onClose }) => {
+const PropertiesPanel = () => {
+    const dispatch = useDispatch();
+    const item = useSelector(selectSelectedItem);
+
+    const onClose = () =>{
+        dispatch(deselectItem());
+    }
+
     if (!item) return null;
 
     const renderProperties = () => {

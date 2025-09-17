@@ -3,24 +3,30 @@ import {useDraggable, useDroppable} from '@dnd-kit/core';
 import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import TableItem from "./TableItem.jsx";
 import {CSS} from '@dnd-kit/utilities'
+import {selectItem, updateItemRotation} from "./reducers/canvasSlice.jsx";
+import {useDispatch, useSelector} from "react-redux";
 
 /** Masaların üzerine sürüklenebilir elemanlar*/
 export const DraggableCanvasItem = ({
-                                        id, type, typeForCss, position, isOverlay = false,
-                                        currentScale,onSelectItem, isSelected,selectedItemId, onUpdateRotation, accepts, children=[]
+                                       item, isOverlay = false, accepts, children=[]
                                     }) => {
+
+    const dispatch = useDispatch();
+    const selectedItemId = useSelector((state) => state.canvas.selectedItemId);
+    const currentScale = useSelector((state) => state.canvas.scale);
+
     const {attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging} = useDraggable({
-        id: id,
+        id: item.id,
         data: {
-            type: type,
+            type: item.type,
             isCanvasItem: true,
         }
     });
 
     const {setNodeRef: setDroppableRef} = useDroppable({
-        id: id,
+        id: item.id,
         data: {
-            type: type,
+            type: item.type,
             accepts: accepts,
         },
     });
@@ -33,17 +39,17 @@ export const DraggableCanvasItem = ({
     // Tıklandığında seçimi tetikle ve event'in canvas'a yayılmasını engelle
     const handleClick = (e) => {
         e.stopPropagation(); // Bu çok önemli! Yoksa canvas'a tıklama olayı da tetiklenir.
-        onSelectItem(id);
+        dispatch(selectItem(item.id)); // tıklanınca reduxta tetikle
     };
 
     const handleRotateClick = (event) => {
         // setNewRotation(prevRotation => prevRotation === 270 ? 0 : prevRotation + 90);
         event.stopPropagation();
-        let newRotation = (position.rotation || 0) + 90;
+        let newRotation = (item.position.rotation || 0) + 90;
         if (newRotation === 360) {
             newRotation = 0;
         }
-        onUpdateRotation(id, newRotation);
+        dispatch(updateItemRotation({id: item.id, newRotation: newRotation}));
     };
 
     const scaledTransform = transform
@@ -56,14 +62,13 @@ export const DraggableCanvasItem = ({
 
     const wrapperStyle = {
         position: isOverlay ? 'relative' : 'absolute',
-        left: isOverlay ? undefined : `${position?.x}px`,
-        top: isOverlay ? undefined : `${position?.y}px`,
+        left: isOverlay ? undefined : `${item.position?.x}px`,
+        top: isOverlay ? undefined : `${item.position?.y}px`,
         transformOrigin: "center center",
         transform: `${transform ? CSS.Translate.toString(scaledTransform) + ' ' : ''}scale(${currentScale})`,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? -1 : 'auto',
     };
-
 
     const childIds = children.map(child => child.id);
 
@@ -81,9 +86,10 @@ export const DraggableCanvasItem = ({
          */
         <div ref={setNodeRef} style={wrapperStyle} {...listeners} {...attributes} onClick={handleClick} className="shape-wrapper">
             <SortableContext items={childIds} strategy={horizontalListSortingStrategy}>
-                <div style={{transform : `rotate(${position.rotation}deg)`, transition: "transform 0.2s ease-in-out"}}
-                     className={`shape shape-${typeForCss}`}>
-                    {typeForCss === "l-shape" && (
+                <div style={{transform : `rotate(${item.position.rotation}deg)`,
+                    transition: "transform 0.2s ease-in-out"}}
+                     className={`shape shape-${item.typeForCss}`}>
+                    {item.typeForCss === "l-shape" && (
                         <div style={{
                             borderStyle: "solid",
                             borderWidth: "0 0",
@@ -98,10 +104,8 @@ export const DraggableCanvasItem = ({
                         <TableItem
                             key={table.id}
                             id={table.id}
-                            parentId={id}
+                            parentId={item.id}
                             typeForCss={table.typeForCss}
-                            onSelectItem={onSelectItem} // onSelectItem fonksiyonunu TableItem'a aktar
-                            isSelected={table.id === selectedItemId}
                         />
                     ))}
                 </div>

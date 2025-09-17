@@ -7,12 +7,10 @@ import AppDnd from "./DndComponents/AppDnd.jsx";
 
 function App() {
     return (
-        <DndProvider backend={HTML5Backend}>
             <div >
                 {/*<CanvasApp />*/}
                 <AppDnd />
             </div>
-        </DndProvider>
     );
 }
 

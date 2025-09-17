@@ -1,7 +1,9 @@
 import {useSortable} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
+import {selectItem} from "./reducers/canvasSlice.jsx";
+import {useDispatch} from "react-redux";
 
-export const TableItem  =  ({id , typeForCss, content, parentId,onSelectItem}) => {
+export const TableItem  =  ({id , typeForCss, content, parentId}) => {
     const { attributes,
         listeners,
         setNodeRef,
@@ -14,6 +16,8 @@ export const TableItem  =  ({id , typeForCss, content, parentId,onSelectItem}) =
                 parentId: parentId
             }
         });
+
+    const dispatch = useDispatch();
 
     const style ={
         transform: CSS.Transform.toString(transform),
@@ -28,7 +32,7 @@ export const TableItem  =  ({id , typeForCss, content, parentId,onSelectItem}) =
         e.stopPropagation();
 
         // 2. App.js'teki state'i güncellemek için kendi ID'n ile onSelectItem'ı çağır.
-        onSelectItem(id);
+        dispatch(selectItem(id));
     };
 
     return (

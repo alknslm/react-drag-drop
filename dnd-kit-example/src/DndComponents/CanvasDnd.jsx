@@ -1,14 +1,16 @@
 // src/components/Canvas.js
-import React, {forwardRef} from 'react';
+import React from 'react';
 import {useDroppable} from '@dnd-kit/core';
 import DraggableCanvasItem from './DraggableCanvasItem';
 import '@xyflow/react/dist/style.css';
 import './Canvas.css';
 import {TransformComponent, TransformWrapper} from "react-zoom-pan-pinch";
 import Controls from "./Controls.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {setScale} from "./reducers/canvasSlice.jsx";
 
 // App.js'ten gelen ref'i kullanabilmek için forwardRef kullanıyoruz.
-const CanvasDnd = forwardRef(({items, onUpdateRotation, scale, onSelectItem, selectedItemId, setScale}, ref) => {
+const CanvasDnd = ({ref}) => {
     const {setNodeRef} = useDroppable({
         id: 'canvas-droppable',
         data: {
@@ -16,6 +18,9 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale, onSelectItem, sel
             accepts: ['canvas-item'],
         },
     });
+    const dispatch = useDispatch();
+    const scale = useSelector(state => state.canvas.scale);
+    const items = useSelector(state => state.canvas.items);
 
 
     // Gelen ref'i ve droppable'dan gelen ref'i birleştiriyoruz.
@@ -34,7 +39,7 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale, onSelectItem, sel
             minScale={1}
             maxScale={5}
             panning={{allowRightClickPan: false, allowLeftClickPan: false}}
-            onTransformed={({state}) => setScale(state.scale)} // scale her değiştiğinde kaydediyoruz
+            onTransformed={({state}) => dispatch(setScale(state.scale))} // scale her değiştiğinde kaydediyoruz
         >
             <>
                 <Controls/>
@@ -63,18 +68,9 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale, onSelectItem, sel
                             {items.map((item) => (
                                 <DraggableCanvasItem
                                     key={item.id}
-                                    id={item.id}
-                                    type={item.type}
-                                    typeForCss={item.typeForCss}
-                                    position={item.position}
-                                    currentScale={item.currentScale}
+                                    item={item}
                                     accepts={item.accepts}
-                                    onUpdateRotation={onUpdateRotation}
                                     isOverlay={item.isOverlay}
-                                    pointerOffset={item.pointerOffset}
-                                    onSelectItem={onSelectItem} // Tıklama fonksiyonunu iletiyoruz
-                                    isSelected={item.id === selectedItemId}
-                                    selectedItemId={selectedItemId}// Seçili olup olmadığını iletiyoruz
                                 >
                                     {item.children}
                                 </DraggableCanvasItem>
@@ -101,6 +97,6 @@ const CanvasDnd = forwardRef(({items, onUpdateRotation, scale, onSelectItem, sel
         // </TransformWrapper>
 
     );
-});
+};
 
 export default CanvasDnd;
