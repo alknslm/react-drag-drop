@@ -255,16 +255,13 @@ function App() {
 
                         dispatch(moveChildBetweenItems({sourceParentId:activeContainer.id , destParentId: overContainer.id, itemToMoveId: active.id, destIndex:destContainerIndex}))
                     }
-                }
-                else{
-                    if (overData?.accepts?.includes(activeData.type)){
-                        //updateItemPosition
-                        const newPosition={
-                            x: snappedX,
-                            y: snappedY,
-                        }
-                        dispatch(updateItemPosition({id:active.id, newPosition: newPosition}));
+                } else {
+                    //updateItemPosition
+                    const newPosition = {
+                        x: snappedX,
+                        y: snappedY,
                     }
+                    dispatch(updateItemPosition({id: active.id, newPosition: newPosition}));
                 }
         }
         setInitialPointerOffset(null); // Sürükleme bitince tutma noktasını sıfırla
