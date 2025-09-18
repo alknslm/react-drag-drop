@@ -1,6 +1,9 @@
 import React from 'react';
 import {useDraggable, useDroppable} from '@dnd-kit/core';
-import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
+import {
+    horizontalListSortingStrategy,
+    SortableContext,
+} from "@dnd-kit/sortable";
 import TableItem from "./TableItem.jsx";
 import {CSS} from '@dnd-kit/utilities'
 import {selectItem, updateItemRotation} from "./reducers/canvasSlice.jsx";
@@ -12,7 +15,6 @@ export const DraggableCanvasItem = ({
                                     }) => {
 
     const dispatch = useDispatch();
-    const selectedItemId = useSelector((state) => state.canvas.selectedItemId);
     const currentScale = useSelector((state) => state.canvas.scale);
 
     const {attributes, listeners, setNodeRef: setDraggableRef, transform, isDragging} = useDraggable({
@@ -65,7 +67,7 @@ export const DraggableCanvasItem = ({
         left: isOverlay ? undefined : `${item.position?.x}px`,
         top: isOverlay ? undefined : `${item.position?.y}px`,
         transformOrigin: "center center",
-        transform: `${transform ? CSS.Translate.toString(scaledTransform) + ' ' : ''}scale(${currentScale})`,
+        transform: `${transform ? CSS.Translate.toString(scaledTransform) + ' ' : ''}`,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? -1 : 'auto',
     };

@@ -56,7 +56,6 @@ const CanvasDnd = ({ref}) => {
                     <div ref={combinedRef} className="canvas">
                         <div
                             className="canvas-grid"
-                            style={{transform: `scale(${scale})`}}
                         />
                         <div className="canvas-content">
                             {items.length === 0 && (
@@ -81,21 +80,6 @@ const CanvasDnd = ({ref}) => {
 
             </>
         </TransformWrapper>
-
-
-        // <TransformWrapper initialScale={1}
-        //                   minScale={0.5}
-        //                   maxScale={7}
-        //                   initialPositionX={200}
-        //                   initialPositionY={100}>
-        //         <Controls/>
-        //         <TransformComponent wrapperStyle={{width: "100%", height: "100%",}}
-        //                             contentStyle={{width: "100%", height: "100%"}}>
-        //
-        //
-        //         </TransformComponent>
-        // </TransformWrapper>
-
     );
 };
 

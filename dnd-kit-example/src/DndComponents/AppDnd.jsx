@@ -19,7 +19,6 @@ import {
 } from "./reducers/canvasSlice.jsx";
 import {
     selectItems,
-    selectSelectedItemId,
     selectSelectedItem,
     selectScale
 } from "./reducers/canvasSlice.jsx";
@@ -29,7 +28,6 @@ function App() {
 
     const dispatch = useDispatch();
     const canvasItems = useSelector(selectItems);
-    const selectedItemId = useSelector(selectSelectedItemId);
     const scale = useSelector(selectScale);
 
     // const [canvasItems, setCanvasItems] = useState([]); // store'a konulacak
@@ -217,26 +215,8 @@ function App() {
                             rotation: 0,
                         },
                         children: [],
-                        pointerOffset: initialPointerOffset,
                     };
                     dispatch(addItem(newItem));
-
-                    // setCanvasItems((items) => [
-                    //     ...items,
-                    //     {
-                    //         id: `${activeData.type}-${Date.now()}`,
-                    //         type: activeData.type,
-                    //         accepts: ['table-items'],
-                    //         typeForCss: activeData.typeForCss,
-                    //         position: {
-                    //             x: snappedX,
-                    //             y: snappedY,
-                    //             rotation: 0,
-                    //         },
-                    //         children: [],
-                    //         pointerOffset: initialPointerOffset,
-                    //     },
-                    // ]);
                 }
             }
 
@@ -248,113 +228,44 @@ function App() {
                     typeForCss: activeData.typeForCss,
                 }
                 dispatch(addChildToItem({parentId: over.id, child: child}));
-
-                // setCanvasItems(items => items.map(item => {
-                //     if (item.id === over.id) {
-                //         return {
-                //             ...item,
-                //             children: [
-                //                 ...item.children,
-                //                 { id: `${activeData.type}-${Date.now()}`, type: activeData.type, typeForCss : activeData.typeForCss },
-                //             ],
-                //         };
-                //     }
-                //     return item;
-                // }));
             }
         } else {
-            if (activeContainer && overContainer) {
-                // Senaryo 2: Aynı konteyner içinde sıralama
-                if (activeContainer.id === overContainer.id) {
-                    //sortChildrenInItem
-                    const container = canvasItems.find(c => c.id === activeContainer.id);
-                    if(container && container.children) {
-                        const oldIndex = container.children.findIndex(item => item.id === active.id);
-                        const newIndex = container.children.findIndex(item => item.id === over.id);
+                if (activeContainer && overContainer) {
+                    // Senaryo 2: Aynı konteyner içinde sıralama
+                    if (activeContainer.id === overContainer.id) {
+                        //sortChildrenInItem
+                        const container = canvasItems.find(c => c.id === activeContainer.id);
+                        if(container && container.children) {
+                            const oldIndex = container.children.findIndex(item => item.id === active.id);
+                            const newIndex = container.children.findIndex(item => item.id === over.id);
 
-                        if(oldIndex !== -1 && newIndex !== -1){
-                            dispatch(sortChildrenInItem({
-                                parentId: activeContainer.id,
-                                oldIndex: oldIndex,
-                                newIndex: newIndex
-                            }))
+                            if(oldIndex !== -1 && newIndex !== -1){
+                                dispatch(sortChildrenInItem({
+                                    parentId: activeContainer.id,
+                                    oldIndex: oldIndex,
+                                    newIndex: newIndex
+                                }))
+                            }
                         }
                     }
+                    // Senaryo 3: Konteynerlar arası taşıma
+                    else {
+                        //movechildBetweenItems
+                        const destContainerIndex = canvasItems.findIndex(c => c.id === overContainer.id);
 
-                    // setCanvasItems(prev => {
-                    //     const newItems = [...prev];
-                    //     const containerIndex = newItems.findIndex(c => c.id === activeContainer.id);
-                    //     if(containerIndex !== -1) {
-                    //         const oldIndex = newItems[containerIndex].children.findIndex(item => item.id === active.id);
-                    //         const newIndex = newItems[containerIndex].children.findIndex(item => item.id === over.id);
-                    //         // Bırakılan yer bir öğe değil de konteynerın kendisi ise sona ekle
-                    //         if (newIndex !== -1) {
-                    //             newItems[containerIndex].children = arrayMove(newItems[containerIndex].children, oldIndex, newIndex);
-                    //         }
-                    //     }
-                    //     return newItems;
-                    // });
+                        dispatch(moveChildBetweenItems({sourceParentId:activeContainer.id , destParentId: overContainer.id, itemToMoveId: active.id, destIndex:destContainerIndex}))
+                    }
                 }
-                // Senaryo 3: Konteynerlar arası taşıma
-                else {
-                    //movechildBetweenItems
-                    const container = canvasItems.find(item => item.id === activeContainer.id);
-                    const destContainerIndex = container.findIndex(item => item.id === overContainer.id);
-
-                    dispatch(moveChildBetweenItems({sourceParentId:activeContainer.id , destParentId: overContainer.id, itemToMoveId: active.id, destIndex:destContainerIndex}))
-
-
-                    // setCanvasItems(prev => {
-                    //     const newItems = [...prev];
-                    //     const sourceContainerIndex = newItems.findIndex(c => c.id === activeContainer.id);
-                    //     const destContainerIndex = newItems.findIndex(c => c.id === overContainer.id);
-                    //
-                    //     if (sourceContainerIndex !== -1 && destContainerIndex !== -1) {
-                    //         const sourceChildren = newItems[sourceContainerIndex].children;
-                    //         const destChildren = newItems[destContainerIndex].children;
-                    //
-                    //         const itemIndex = sourceChildren.findIndex(item => item.id === active.id);
-                    //         const [movedItem] = sourceChildren.splice(itemIndex, 1);
-                    //
-                    //         // Bırakılan yer bir öğenin üstü mü yoksa konteynerın kendisi mi?
-                    //         const overItemIndex = destChildren.findIndex(item => item.id === over.id);
-                    //         if (overItemIndex !== -1) {
-                    //             destChildren.splice(overItemIndex, 0, movedItem);
-                    //         } else {
-                    //             destChildren.push(movedItem); // Konteyner boşsa veya sona bırakıldıysa
-                    //         }
-                    //     }
-                    //     return newItems;
-                    // });
+                else{
+                    if (overData?.accepts?.includes(activeData.type)){
+                        //updateItemPosition
+                        const newPosition={
+                            x: snappedX,
+                            y: snappedY,
+                        }
+                        dispatch(updateItemPosition({id:active.id, newPosition: newPosition}));
+                    }
                 }
-            }
-            else{
-                //updateItemPosition
-                const newPosition={
-                    x: snappedX,
-                    y: snappedY,
-                }
-                dispatch(updateItemPosition({id:active.id, newPosition: newPosition}));
-
-
-                // setCanvasItems((items) =>
-                //     items.map((item) => {
-                //         if (item.id === active.id) {
-                //             return {
-                //                 ...item,
-                //                 position: {
-                //                     ...item.position,
-                //                     x: snappedX,
-                //                     y: snappedY}
-                //                 ,
-                //                 pointerOffset: initialPointerOffset,
-                //             };
-                //         }
-                //         return item;
-                //     })
-                // );
-            }
-
         }
         setInitialPointerOffset(null); // Sürükleme bitince tutma noktasını sıfırla
     };
@@ -384,11 +295,13 @@ function App() {
             {/* DragOverlay, sürüklenen elemanı en üste taşır */}
             <DragOverlay modifiers={[ restrictToWindowEdges]}>
                 {activeItem && initialPointerOffset ? (
-                    <DraggableCanvasItem
-                        item={activeItem}
-                        isOverlay={true}
-                        pointerOffset={initialPointerOffset}
-                    />
+                    <div style={{transform: `scale(${scale})`}}>
+                        <DraggableCanvasItem
+                            item={activeItem}
+                            isOverlay={true}
+                            pointerOffset={initialPointerOffset}
+                        />
+                    </div>
                 ) : null}
             </DragOverlay>
         </DndContext>

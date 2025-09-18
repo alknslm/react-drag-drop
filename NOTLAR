@@ -1,2 +1,6 @@
 npm install @dnd-kit/core @dnd-kit/modifiers @dnd-kit/utilities
 npm install
+
+
+Şekillerin drag esnasında büyümesi ya da küçülmesi scale değerinin uyugulanıp uygulanmasında kaynaklı.
+Eğer taşınırken scale 1 miş gibi davranıyorsa DragOverlay nesnesine scale uygulanmıyordur. div'e sarıp scale değerini div'e uyguladık.
