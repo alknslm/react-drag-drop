@@ -14,7 +14,7 @@ const PropertiesPanel = () => {
     if (!item) return null;
 
     const renderProperties = () => {
-        switch (item.type) {
+        switch (item.data.type) {
             case 'canvas-item':
                 return (
                     <>
@@ -24,7 +24,7 @@ const PropertiesPanel = () => {
                         </div>
                         <div className="prop-item">
                             <label>Modül</label>
-                            <span>{item.type}</span>
+                            <span>{item.data.type}</span>
                         </div>
                         <div className="prop-item">
                             <label>Oturan Kişi</label>
@@ -32,7 +32,7 @@ const PropertiesPanel = () => {
                         </div>
                     </>
                 );
-            case 'table-items':
+            case 'static-child':
                 return (
                     <>
                         <div className="prop-item">
@@ -57,7 +57,7 @@ const PropertiesPanel = () => {
     return (
         <div className="properties-panel">
             <div className="panel-header">
-                <h3>{item.type} Özellikleri</h3>
+                <h3>{item.data.type} Özellikleri</h3>
                 <button onClick={onClose} className="close-btn">&times;</button>
             </div>
             <div className="panel-content">

@@ -1,51 +1,109 @@
-/* src/components/Sidebar.css */
+/* Sidebar.css */
 .sidebar {
-    width: 150px;
-    background-color: #f0f0f0;
-    padding: 20px;
-    border-right: 2px solid #ddd;
+    width: 280px;
+    background: #fafafa;
+    padding: 24px 20px;
+    border-right: 1px solid #e0e0e0;
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, sans-serif;
     display: flex;
     flex-direction: column;
+    gap: 24px;
 }
 
-.sidebar h3 {
-    margin-top: 0;
-}
-
-.sidebar-furniture {
+.sidebar-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
     display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
+    align-items: center;
     gap: 8px;
-    border: 2px solid #34495e;
-    padding: 5px;
 }
 
-.sidebar-items {
+.sidebar-header p {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.sidebar-section {
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
-    gap: 8px;
-    border: 2px solid #34495e;
-    padding: 5px;
+    gap: 12px;
 }
+
+.sidebar-section h4 {
+    margin: 0 0 8px 0;
+    padding: 6px 0;
+    border-bottom: 2px solid #f0f0f0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- Draggable Sidebar Item Stilleri --- */
 
 .sidebar-item {
-    padding: 20px;
-    background-color: #fff;
-    border: 2px dashed #ccc;
+    padding: 14px 16px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     cursor: grab;
-    text-align: center;
-    font-weight: bold;
-    transition: background-color 0.2s ease-in-out;
-    transform-origin: center;
+    user-select: none;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
 }
 
 .sidebar-item:hover {
-    background-color: #e9f5ff;
-    border-color: #007bff;
+    background: #f8f9fa;
+    border-color: #ccc;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 .sidebar-item:active {
-    cursor: move;
+    cursor: grabbing;
+    transform: translateY(0) scale(0.98);
+    background: #f0f0f0;
+}
+
+/* Sol border ile tip bazlı renklendirme */
+.sidebar-item-square,
+.sidebar-item-round,
+.sidebar-item-l-shape {
+    border-left: 4px solid #2196f3; /* Mavi — Mobilya */
+}
+
+.sidebar-item-curved-monitor,
+.sidebar-item-flat-monitor,
+.sidebar-item-computer-tower,
+.sidebar-item-keyboard {
+    border-left: 4px solid #4caf50; /* Yeşil — Malzemeler */
+}
+
+.sidebar-item-wall {
+    border-left: 4px solid #795548; /* Kahverengi — Duvar */
+}
+
+/* Sürüklendiğinde soluklaştırma — opacity zaten JS'te 0.5 */
+/* Burada sadece görsel tutarlılık için ekstra efekt */
+.sidebar-item[style*="opacity: 0.5"] {
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.3);
+    z-index: 10;
+    position: relative;
 }

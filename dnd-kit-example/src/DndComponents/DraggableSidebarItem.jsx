@@ -1,32 +1,39 @@
-// src/components/DraggableSidebarItem.js
+// src/components/DraggableSidebarItem.jsx
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 
-/** Kenar çubuğundaki her ögeyi temsil eder*/
-const DraggableSidebarItem = ({ id, type, children, typeForCss }) => {
+/**
+ * Sidebar'daki sürüklenebilir öğeler.
+ * type: 'canvas-item' | 'static-child' | 'wall-item'
+ * typeForCss: CSS sınıfı ve görünüm için (ör: "square", "curved-monitor")
+ * children: Gösterilecek içerik (etiket, ikon, vs.)
+ */
+const DraggableSidebarItem = ({ id, type, typeForCss, children }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: `sidebar-${id}`,
-        data: {
-            type: type,
-            isSidebarItem: true,
-            typeForCss: typeForCss,
-        },
-    });
+        id: `sidebar-${id}`, // Benzersiz değil, her sürüklemeye yeni ID vermek istersen App.js'te yönet
+    data:{
+        type,
+        isSidebarItem: true,
+        typeForCss,
+        accepts: type === 'canvas-item' ? ['static-child'] : undefined,
+    },
+});
 
     const style = {
         transform: CSS.Translate.toString(transform),
-        // Sürüklenirken orijinal elemanı biraz soluklaştır
-        opacity: isDragging ? 0 : 1,
+        opacity: isDragging ? 0.5 : 1, // Sürüklenirken soluk görünsün
+        cursor: 'grab',
+        userSelect: 'none',
     };
 
     return (
         <div
-            className={`sidebar-item sidebar-item-${typeForCss}`}
             ref={setNodeRef}
             style={style}
             {...listeners}
             {...attributes}
+            className={`sidebar-item sidebar-item-${typeForCss}`}
         >
             {children}
         </div>
