@@ -3,7 +3,7 @@
 // src/components/canvas/ResizableContainerItem.jsx
 import React, { useRef } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import {horizontalListSortingStrategy, SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import {horizontalListSortingStrategy, SortableContext} from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import { useDispatch, useSelector } from "react-redux";
 import StaticChildItem from "./StaticChildItem.jsx"; // Çocuklar için
@@ -47,26 +47,32 @@ const ResizableContainerItem = ({ item, isOverlay = false }) => {
     // Resize işlemleri
     const handleResizeStart = (event) => {
         startPosition.current = { x: event.clientX, y: event.clientY };
-        initialSize.current = { width: item.data.size?.width || 100, height: item.data.size?.height || 100 };
+        initialSize.current = {
+            width: item.data.size?.width || 100,
+            height: item.data.size?.height || 100
+        };
     };
 
     const handleResizeMove = (event) => {
-        // 🚨 Artık event.deltaX ve event.deltaY scale'e göre normalize edilmiş!
-        const deltaX = event.deltaX; // ZATEN scale'e bölünmüş!
+        const deltaX = event.deltaX;
         const deltaY = event.deltaY;
 
-        const newWidth = Math.max(50, initialSize.current.width + deltaX);
-        const newHeight = Math.max(50, initialSize.current.height + deltaY);
+        // Hassasiyet ayarı - istediğiniz gibi ayarlayın
+        const sensitivity = 1; // Daha yavaş için 0.1-0.5 arası deneyin
+
+        const newWidth = Math.max(50, initialSize.current.width + (deltaX * sensitivity));
+        const newHeight = Math.max(50, initialSize.current.height + (deltaY * sensitivity));
 
         dispatch(updateItemSize({
             id: item.id,
-            width: newWidth,
-            height: newHeight,
+            width: Math.round(newWidth),
+            height: Math.round(newHeight),
         }));
+
+        // 🚨 KESİNLİKLE initialSize'ı güncellemeyin!
     };
 
     const handleResizeEnd = () => {
-        // İsteğe bağlı
     };
 
     // Tıklanınca seç
@@ -103,7 +109,6 @@ const ResizableContainerItem = ({ item, isOverlay = false }) => {
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? -1 : 'auto',
         borderRadius: item.typeForCss === 'round-table' ? '50%' : '8px',
-        backgroundColor: 'red'
     };
 
     const childIds = item.data.children?.map(child => child.id) || [];

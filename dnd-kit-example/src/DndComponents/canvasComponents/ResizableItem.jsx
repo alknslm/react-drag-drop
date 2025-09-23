@@ -14,7 +14,7 @@ const WallItem = ({ item, isOverlay = false }) => {
     const dispatch = useDispatch();
     const currentScale = useSelector((state) => state.canvas.scale);
 
-    const initialSize = useRef({ width: item.data.size?.width || 100, height: item.data.size?.height || 20 });
+    const initialSize = useRef({ width: item.data.size?.width || 50, height: item.data.size?.height || 10 });
     const startPosition = useRef({ x: 0, y: 0 });
 
     // Sadece sürüklenebilir — içine çocuk alamaz
@@ -29,14 +29,14 @@ const WallItem = ({ item, isOverlay = false }) => {
     // Resize işlemleri
     const handleResizeStart = (event) => {
         startPosition.current = { x: event.clientX, y: event.clientY };
-        initialSize.current = { width: item.data.size?.width || 100, height: item.data.size?.height || 20 };
+        initialSize.current = { width: item.data.size?.width || 50, height: item.data.size?.height || 10 };
     };
 
     const handleResizeMove = (event) => {
         const deltaX = event.deltaX; // ZATEN scale'e göre normalize edilmiş!
         const deltaY = event.deltaY;
 
-        const newWidth = Math.max(50, initialSize.current.width + deltaX);
+        const newWidth = Math.max(10, initialSize.current.width + deltaX);
         const newHeight = Math.max(10, initialSize.current.height + deltaY);
 
         dispatch(updateItemSize({
@@ -83,7 +83,7 @@ const WallItem = ({ item, isOverlay = false }) => {
         transform: `${transform ? CSS.Translate.toString(scaledTransform) + ' ' : ''}`,
         opacity: isDragging ? 0 : 1,
         zIndex: isDragging ? -1 : 'auto',
-        backgroundColor: '#795548',
+        backgroundColor: 'lightgrey',
         borderRadius: '4px',
         border: '1px solid #5d4037',
         cursor: 'move',

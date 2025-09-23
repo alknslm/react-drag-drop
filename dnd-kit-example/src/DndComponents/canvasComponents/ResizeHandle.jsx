@@ -1,13 +1,12 @@
 // src/components/canvas/ResizeHandle.jsx
 import React, { useEffect, useRef } from 'react';
 import { useDraggable } from '@dnd-kit/core';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 const ResizeHandle = ({ itemId, onResizeStart, onResizeMove, onResizeEnd }) => {
-    const dispatch = useDispatch();
     const currentScale = useSelector((state) => state.canvas.scale);
 
-    const {attributes, listeners, setNodeRef, isDragging} = useDraggable({
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: `resize-${itemId}`,
         data: {
             type: 'resize',
@@ -15,54 +14,51 @@ const ResizeHandle = ({ itemId, onResizeStart, onResizeMove, onResizeEnd }) => {
         },
     });
 
-    const handleRef = useRef(null);
-    const startPositionRef = useRef({ x: 0, y: 0 });
+    const isResizing = useRef(false);
+    const startPosition = useRef({ x: 0, y: 0 });
+    const hasStarted = useRef(false); // 🆕 Start'ın sadece bir kere çağrılması için
 
     useEffect(() => {
-        if (!isDragging) return;
+        if (!isDragging) {
+            isResizing.current = false;
+            hasStarted.current = false; // Reset
+            return;
+        }
 
         const handleMouseMove = (event) => {
-            event.stopPropagation();
-            // 🚨 HATA BURADAYDI: event.clientX'e göre değil, handle'ın pozisyonuna göre hesapla
-            const handleRect = handleRef.current?.getBoundingClientRect();
-            if (!handleRect) return;
+            if (!isResizing.current) return;
 
-            const deltaX = (event.clientX - startPositionRef.current.x) / currentScale;
-            const deltaY = (event.clientY - startPositionRef.current.y) / currentScale;
+            // 🆕 Sadece ilk seferde start çağrılsın
+            if (!hasStarted.current) {
+                hasStarted.current = true;
+                startPosition.current = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+                onResizeStart?.(event);
+                return; // İlk hareketi atla
+            }
 
-            onResizeMove && onResizeMove({
+            // Toplam delta hesapla (ilk pozisyona göre)
+            const totalDeltaX = (event.clientX - startPosition.current.x) / currentScale;
+            const totalDeltaY = (event.clientY - startPosition.current.y) / currentScale;
+
+            onResizeMove?.({
                 ...event,
-                deltaX,
-                deltaY,
+                deltaX: totalDeltaX,
+                deltaY: totalDeltaY,
             });
         };
 
         const handleMouseUp = () => {
-            onResizeEnd && onResizeEnd();
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            isResizing.current = false;
+            hasStarted.current = false;
+            onResizeEnd?.();
         };
 
-        const handleMouseDown = (event) => {
-            console.log("çlaıştı")
-            event.stopPropagation();
-            const handleRect = handleRef.current?.getBoundingClientRect();
-            if (handleRect) {
-                // 🚨 HATA BURADAYDI: event.clientX/Y yerine handle'ın pozisyonunu baz al
-                startPositionRef.current = {
-                    x: handleRect.left + handleRect.width / 2, // Merkez noktası
-                    y: handleRect.top + handleRect.height / 2,
-                };
-            } else {
-                // Yedek: handleRect yoksa event'i kullan (nadiren gerekir)
-                startPositionRef.current = { x: event.clientX, y: event.clientY };
-            }
-            onResizeStart && onResizeStart(event);
-        };
-
-        const node = handleRef.current;
-        if (node) {
-            node.addEventListener('mousedown', handleMouseDown, { once: true });
+        // Dragging başladığında
+        if (!hasStarted.current) {
+            isResizing.current = true;
         }
 
         window.addEventListener('mousemove', handleMouseMove);
@@ -71,21 +67,12 @@ const ResizeHandle = ({ itemId, onResizeStart, onResizeMove, onResizeEnd }) => {
         return () => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
-            if (node) {
-                node.removeEventListener('mousedown', handleMouseDown);
-            }
         };
     }, [isDragging, onResizeStart, onResizeMove, onResizeEnd, currentScale]);
 
-    // 🚨 setNodeRef'i handleRef ile birleştir
-    const combinedRef = (node) => {
-        setNodeRef(node);
-        handleRef.current = node;
-    };
-
     return (
         <div
-            ref={combinedRef} // 👈 handleRef burada atanıyor
+            ref={setNodeRef}
             {...listeners}
             {...attributes}
             style={{
