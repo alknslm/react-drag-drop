@@ -107,3 +107,52 @@
     z-index: 10;
     position: relative;
 }
+
+/* ========== ACCORDION STYLES ========== */
+
+.section-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-toggle:hover {
+    color: #007bff;
+}
+
+/* İçerik konteyneri — animasyonlu aç/kapa */
+.section-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 0;
+}
+
+.section-content.open {
+    max-height: 1000px; /* Yeterince büyük bir değer — içerik taşmazsa sorun yok */
+    padding: 12px 0 0 0; /* Üstten boşluk, soldan sıfır — zaten item'lar kendi padding'lerini alıyor */
+}
+
+/* İçerik içindeki item'lar — sidebar-section içindeki gap:12px ile uyumlu olacak şekilde */
+.section-content .sidebar-item {
+    margin: 0; /* sidebar-section zaten gap ile yönetiyor */
+}
+
+/* Opsiyonel: animasyonu daha yumuşatmak istersen */
+.section-content.open .sidebar-item {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
